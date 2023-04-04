@@ -1,4 +1,4 @@
-# Pipeline
+# Museum data pipeline
 
 This folder contains python script for reading a kafka data stream, verifying and cleaning the data, and inserting it into a database.
 
