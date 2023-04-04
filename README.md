@@ -30,3 +30,6 @@ SASL_PASSWORD=j
 2 optional flags:
 --l :logs all erroneous data values to an error log txt file.
 --e :begins kafka data stream from earliest entry rather than the latest.
+2 optional arguments:
+--t :name of kafka cluster topic we want to listen to.
+--n :number of messages we want to listen for.
