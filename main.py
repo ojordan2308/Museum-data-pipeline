@@ -1,3 +1,4 @@
+#pylint: disable=invalid-name
 """Connects to museum Kafka cluster and cleans incoming kiosk data."""
 import json
 from datetime import datetime
@@ -36,8 +37,8 @@ def log_invalid_message(invalid_message: dict, reason: str, write_to_log: bool) 
     """Either records data errors in txt file or prints them to terminal."""
     print(f"MESSAGE ERROR: {reason}")
     if write_to_log:
-        with open('./error-log.txt', 'w', encoding='utf-8') as log:
-            log.write(f"MESSAGE: {invalid_message} \nMESSAGE ERROR: {reason}")
+        with open('./error-log.txt', 'a+', encoding='utf-8') as log:
+            log.write(f"MESSAGE: {invalid_message} \nMESSAGE ERROR: {reason}\n")
 
 def consume_messages(consumer: Consumer, topic: str, conn: connection, 
                      write_to_log: bool, limit: int) -> None:
@@ -119,6 +120,7 @@ def consume_messages(consumer: Consumer, topic: str, conn: connection,
                                 VALUES (%s, %s, %s);"""
                     params = (exhibition_id, assistance_type_id, time)
                     curs.execute(query, params)
+                    conn.commit()
                 continue
             # Insert exhibition rating data
             with conn.cursor(cursor_factory=RealDictCursor) as curs:
@@ -126,6 +128,7 @@ def consume_messages(consumer: Consumer, topic: str, conn: connection,
                             VALUES (%s, %s, %s);"""
                 params = (exhibition_id, rating, time)
                 curs.execute(query, params)
+                conn.commit()
 
 if __name__ == "__main__":
     args = collect_arguments()
@@ -138,7 +141,7 @@ if __name__ == "__main__":
         'sasl.mechanisms': 'PLAIN',
         'sasl.username': config["SASL_USERNAME"],
         'sasl.password': config["SASL_PASSWORD"],
-        'group.id': 'newyearnewme',
+        'group.id': 'qwerty',
         'auto.offset.reset': offset
     }
     cons = Consumer(kafka_config)
@@ -147,10 +150,8 @@ if __name__ == "__main__":
 
     try:
         consume_messages(cons, args.t, conn, args.l, args.n)
-
     except KeyboardInterrupt:
         print(" Thank goodness that's over")
     finally:
         cons.close()
-        conn.commit()
         conn.close()

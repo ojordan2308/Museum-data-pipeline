@@ -11,3 +11,5 @@ if __name__ == "__main__":
         query = """DELETE FROM exhibition_rating;
                    DELETE FROM exhibition_help;"""
         curs.execute(query)
+    conn.commit()
+    conn.close()
